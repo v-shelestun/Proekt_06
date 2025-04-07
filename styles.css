@@ -1,0 +1,539 @@
+/* ===== Reset и базовые стили ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+
+:root {
+  --storage-color: #4CAF50;
+  --production-color: #FF9800;
+  --manufacturing-color: #2196F3;
+  --assembly-color: #9C27B0;
+  --product-color: #F44336;
+  --quality-color: #009688;
+  --packaging-color: #795548;
+}
+
+/* ===== Основная структура ===== */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+.workspace {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+
+#layout {
+ position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  max-height: 600px;
+  margin: 0 auto;
+  border: 1px solid #ddd; /* Для визуализации */
+}
+
+/* ===== SVG-контейнеры ===== */
+.svg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#svg-plan {
+	  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: #f9f9f9;
+  z-index: 1;
+}
+
+#routes-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;	
+  z-index: 2;
+}
+
+.layout-svg {
+  width: 100%;
+  height: 100%;
+  background-color: #f5f5f5;
+}
+
+/* ===== Стили точек ===== */
+.point {
+  stroke: white;
+  stroke-width: 2;
+  opacity: 0.9;
+  transition: all 0.2s;
+  cursor: pointer;
+  pointer-events: auto;
+  r: 6;
+  transform: none !important;
+  transition: none !important;
+  pointer-events: auto !important; 
+    transform-box: fill-box;
+  transform-origin: center;
+  vector-effect: non-scaling-stroke
+  transform: translate(0,0) !important;
+}
+
+.point:hover {
+  opacity: 1;
+  r: 10;
+}
+
+/* Цвета точек */
+.point-storage { fill: var(--storage-color); }
+.point-production { fill: var(--production-color); }
+.point-manufacturing { fill: var(--manufacturing-color); }
+.point-assembly { fill: var(--assembly-color); }
+.point-product { fill: var(--product-color); }
+.point-quality { fill: var(--quality-color); }
+.point-packaging { fill: var(--packaging-color); }
+
+/* Анимации точек */
+.point.route-start {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.point:active {
+  animation: click-pulse 0.5s;
+}
+
+@keyframes click-pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* ===== Панель управления ===== */
+#pointsPanel {
+  position: fixed;
+  top: 100px; /* Смещаем ниже панели инструментов */
+  right: 20px;
+  transform: none; /* Убираем предыдущее transform */);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  padding: 15px;
+  width: 220px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.point-types {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.point-type {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8f8f8;
+  cursor: pointer;
+  border: 1px solid #e0e0e0;
+  transition: all 0.2s;
+}
+/* Убираем синюю подсветку у кнопки склада */
+.point-type.selected {
+  background: #f8f8f8 !important; /* Переопределяем синий фон */
+  border-color: #e0e0e0 !important;
+  box-shadow: none !important;
+}
+
+.point-type:hover {
+  background: #f0f0f0;
+}
+
+.point-type.selected {
+  background: #e3f2fd;
+  border-color: #2196F3;
+  box-shadow: inset 0 0 0 1px #2196F3;
+}
+
+.point-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+/* ===== Элементы управления ===== */
+.zoom-controls {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 8px 15px;
+  border-radius: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+}
+
+.zoom-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: #f5f5f5;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zoom-btn:hover {
+  background: #e0e0e0;
+}
+
+.crosshair-cursor {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 0v20M0 10h20" stroke="red" stroke-width="2"/></svg>') no-repeat center;
+  z-index: 9999;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+/* ===== Маршруты ===== */
+.temp-route {
+  stroke-dasharray: 5,5;
+  animation: dash 0.5s linear infinite;
+  opacity: 0.7;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+  shape-rendering: geometricPrecision;
+}
+
+.permanent-route {
+  stroke-linecap: round;
+  pointer-events: visibleStroke;
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: 8; }
+}
+
+/* ===== Адаптивность ===== */
+@media (max-width: 768px) {
+  #pointsPanel {
+    width: 180px;
+    right: 10px;
+    padding: 12px;
+  }
+  /* Активное состояние при клике */
+.point-type:active {
+  background: #e0e0e0 !important;
+}
+  
+  .point-type {
+    padding: 8px 10px;
+  }
+}
+/* Обновлённые стили для рабочей области */
+#layout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+.image-container {
+  max-width: 90%;
+  max-height: 90%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.layout-svg {
+  max-width: 100%;
+  max-height: calc(200vh - 300px); /* Оставляем место для панелей */
+  display: block;
+  margin: 0 auto;
+}
+  .action-btn {
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.action-btn:hover {
+  background: #f0f0f0;
+}
+
+.icon-trash {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>') no-repeat center;
+}
+.dropdown-menu {
+  position: absolute;
+  top: 60px;
+  right: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  display: none;
+  flex-direction: column;
+  z-index: 1001;
+}
+
+.dropdown-menu button {
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dropdown-menu button:hover {
+  background: #f5f5f5;
+}
+/* Добавьте в ваш CSS */
+#route-plan-btn {
+  background: #4285f4;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: background 0.3s;
+}
+
+#route-plan-btn:hover {
+  background: #3367d6;
+}
+
+.dropdown-menu {
+  position: fixed;
+    top: 60px;
+    right: 20px;
+    display: none;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  display: none;
+  flex-direction: column;
+  width: 200px;
+}
+
+.route-option {
+  padding: 10px 15px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.route-option:hover {
+  background: #f5f5f5;
+.route-menu {
+  position: absolute;
+  top: 100%; /* Размещаем под кнопкой */
+  left: 0;
+  z-index: 1000; /* Убедимся, что выше других элементов */
+  background: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  display: none; /* Скрыто по умолчанию *}
+
+.route-menu.show {
+  display: block; /* Показываем при активации */
+}
+  
+
+  
+  .route-path {  
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.route-path:hover {
+  stroke-width: 4;
+}
+/* Стили для отладочной панели */
+.debug-panel {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.7);
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  font-family: monospace;
+  z-index: 9999;
+}
+
+.debug-point {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: red;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9998;
+}
+.debug-route {
+  stroke: #ff0000 !important;
+  stroke-width: 4px !important;
+  stroke-dasharray: 5,5 !important;
+  opacity: 1 !important;
+  z-index: 9999 !important;
+}
+/* Основные стили для SVG контейнеров */
+#layout {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#svg-plan, #routes-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#routes-svg {
+  z-index: 2; /* Должен быть выше svg-plan */
+    transform: scale(1); /* Сброс масштаба */
+  transform-box: fill-box;
+}
+
+/* Стили для маршрутов */
+.route-path {
+  stroke-width: 4px;
+  stroke-linecap: round;
+  fill: none;
+  pointer-events: visibleStroke;
+}
+
+/* Принудительное отображение для отладки */
+.debug-route {
+  stroke: red !important;
+  stroke-width: 8px !important;
+  opacity: 1 !important;
+}
+path.permanent-route {
+  vector-effect: non-scaling-stroke; /* Для чёткого отображения */
+}
+/* Стили для панели управления */
+.control-panel {
+  display: flex;
+  gap: 8px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-bottom: 1px solid #ddd;
+  position: relative; /* Для абсолютного позиционирования меню */
+  z-index: 100;
+}
+
+/* Стандартный стиль кнопок */
+.control-panel button {
+  padding: 8px 12px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Особый стиль для кнопки загрузки */
+#upload-btn {
+  background: #4CAF50;
+  color: white;
+}
+
+/* Выпадающее меню маршрутов */
+#route-menu {
+  position: absolute;
+  top: 100%; /* Позиционируется под панелью */
+  left: 200px; /* Примерное положение под кнопкой "Разработать маршрут" */
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: none;
+  flex-direction: column;
+  z-index: 101; /* Выше панели */
+  min-width: 150px;
+}
+
+#route-menu.show {
+  display: flex;
+}
+
+#route-menu button {
+  padding: 8px 12px;
+  text-align: left;
+  background: none;
+  border: none;
+  border-bottom: 1px solid #eee;
+}
+
+#route-menu button:hover {
+  background: #f5f5f5;
+}
+/* Фиксируем положение точек */
+.point {
+  transform: none !important;
+  transition: none !important;
+}
+
+/* Отключаем эффекты наведения */
+.point:hover {
+  transform: none !important;
+}

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Планировка производства</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .route-header {
+            background: #2c3e50;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            background: #f0f0f0;
+        }
+        
+        .workspace {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        #layout-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            background: #ecf0f1;
+        }
+        
+        #svg-plan {
+            width: 100%;
+            height: 100%;
+            background: #f9f9f9;
+        }
+        
+        .zoom-controls {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 200;
+        }
+        
+        .pointsPanel {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            background: white;
+            padding: 10px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Шапка -->
+        <div class="route-header">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <h2 style="margin: 0;">Маршрут изделия:</h2>
+                <input type="text" id="route-name" style="font-size: inherit; padding: 5px; width: 300px;">
+            </div>
+        </div>
+
+        <!-- Панель управления -->
+<div class="control-panel">
+    <button id="upload-btn">Загрузить планировку</button>
+    <input type="file" id="file-upload" accept=".svg,image/svg+xml" style="display: none">
+    
+    <button id="add-points-btn">Добавить точки</button>
+    <!-- Изменено с create-route-btn на route-plan-btn -->
+    <button id="route-plan-btn">Разработать маршрут</button>
+    
+    <button id="save-data-btn">Сохранить маршрут</button>
+    <button id="save-as-btn">Сохранить как...</button>
+    
+    <button id="load-data-btn">Загрузить маршрут</button>
+    <button id="clear-data-btn">Очистить</button>
+</div>
+
+<!-- Рабочая область (упрощенная версия) -->
+<div class="workspace">
+    <div id="layout">
+        <svg id="svg-plan" preserveAspectRatio="xMidYMid meet"></svg>
+        <svg id="routes-svg"></svg>
+    </div>
+</div>
+
+<!-- Меню маршрутов (перенесено в конец body) -->
+<div id="route-menu" class="dropdown-menu">
+    <button id="add-route-btn">Добавить путь</button>
+    <button id="remove-route-btn">Удалить путь</button>
+</div>
+		<!-- Панель точек -->
+<div id="pointsPanel" class="point-panel">
+  <div class="panel-header">
+    <h3>Точки маршрута</h3>
+<div class="point-type" data-type="storage">
+  <span class="point-icon" style="background: var(--storage-color)"></span>
+  Склад 
+</div>
+<div class="point-type" data-type="production">
+  <span class="point-icon" style="background: var(--production-color)"></span>
+  Изготовление заготовок
+</div>
+<div class="point-type" data-type="manufacturing">
+  <span class="point-icon" style="background: var(--manufacturing-color)"></span>
+  Изготовление деталей
+</div>
+<div class="point-type" data-type="assembly">
+  <span class="point-icon" style="background: var(--assembly-color)"></span>
+  Изготовление сборок
+</div>
+<div class="point-type" data-type="product">
+  <span class="point-icon" style="background: var(--product-color)"></span>
+  Сборка изделия
+</div>
+<div class="point-type" data-type="quality">
+  <span class="point-icon" style="background: var(--quality-color)"></span>
+ Конроль качества
+</div>
+<div class="point-type" data-type="packaging">
+  <span class="point-icon" style="background: var(--packaging-color)"></span>
+  Упаковка
+</div>
+	
+	    <button id="remove-point-btn" class="action-btn">
+  <i class="icon-trash"></i> Удалить последнюю точку
+</button>
+  </div>
+  </div>
+</div>
+       
+
+        <!-- Уведомления -->
+        <div class="notification" id="notification"></div>
+    </div>
+	<!-- Контейнер для уведомлений (можно добавить в любое место) -->
+<div id="notification" class="notification"></div>
+
+    <!-- Подключение скрипта -->
+    <script src="script.js"></script>
+</body>
+</html>
