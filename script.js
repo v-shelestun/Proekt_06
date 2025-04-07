@@ -8,6 +8,7 @@ class RoutePlanner {
 
     // Инициализация состояния (один раз!)
     this.state = {
+	 isTempRoute: false,	
       points: [],
       selectedPointType: 'storage',
       isPointMode: false,
@@ -373,7 +374,7 @@ toggleRouteMenu(show = null) {
     }
   }
   // Обновление временного маршрута
-  updateTempRoute() {
+/*   updateTempRoute() {
     if (!this.state.currentRoute || this.state.currentRoute.points.length < 2) return;
 
     // Удаляем предыдущий временный маршрут
@@ -477,7 +478,128 @@ function logRouteData(points) {
 }
 
 
+  } */
+/* buildRoute(points) {
+  // Проверка входных данных
+  if (!points || !points.length) {
+    console.error("Нет точек для построения маршрута");
+    return null;
   }
+
+  try {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    let d = '';
+    const style = this.getRouteStyle(points[0].type);
+
+    // Обработка точек
+    points.forEach((point, index) => {
+      const center = this._getPointCenter(point);
+      if (index === 0) {
+        d = `M ${center.x} ${center.y}`;
+      } else {
+        d += ` L ${center.x} ${center.y}`;
+      }
+    });
+
+    // Применение атрибутов
+    path.setAttribute('d', d);
+    Object.entries(style).forEach(([key, value]) => {
+      path.style[key] = value;
+    });
+
+    return path;
+  } catch (error) {
+    console.error("Ошибка в buildRoute:", error);
+    return null;
+  }
+}
+_getPointCenter(point) {
+  if (!point || !point.id) {
+    console.warn("Некорректная точка:", point);
+    return { x: 0, y: 0 };
+  }
+
+  const elem = document.querySelector(`[data-id="${point.id}"]`);
+  if (!elem) {
+    console.warn(`Элемент точки ${point.id} не найден`);
+    return { x: point.x, y: point.y };
+  }
+
+  const bbox = elem.getBBox();
+  return {
+    x: bbox.x + bbox.width / 2,
+    y: bbox.y + bbox.height / 2
+  };
+}
+
+getRouteStyle(type) {
+  const colors = {
+    storage: '#4CAF50',
+    production: '#FF9800',
+    assembly: '#9C27B0',
+    default: '#2196F3'
+  };
+
+  return {
+    stroke: colors[type] || colors.default,
+    strokeWidth: '3px',
+    fill: 'none',
+    vectorEffect: 'non-scaling-stroke',
+    ...(this.state.isTempRoute && {
+      strokeDasharray: '5,3',
+      opacity: '0.7'
+    })
+  };
+}
+finishRoute() {
+  const routePath = this.buildRoute(this.state.currentRoute.points);
+  this.elements.routesSvg.appendChild(routePath);
+}
+updateTempRoute(currentPosition) {
+  if (!this.state.currentRoute?.points.length) return;
+  
+  const points = [...this.state.currentRoute.points];
+  points.push({ // Добавляем текущую позицию курсора
+    x: currentPosition.x,
+    y: currentPosition.y,
+    type: points[0].type,
+    id: 'cursor-position'
+  });
+  
+  this.state.tempPath = this.buildRoute(points);
+  this.state.tempPath.classList.add('temp-route');
+}
+startTempRoute(startPoint) {
+  this.state.isTempRoute = true;
+  this.state.currentRoute = {
+    points: [startPoint],
+    tempPath: this.buildRoute([startPoint])
+  };
+  this.elements.routesSvg.appendChild(this.state.currentRoute.tempPath);
+} */
+
+// Вспомогательные методы
+_getPointCenter(point) {
+  const elem = document.querySelector(`[data-id="${point.id}"]`);
+  const bbox = elem?.getBBox() || { x: point.x, y: point.y, width: 0, height: 0 };
+  return {
+    x: bbox.x + bbox.width/2,
+    y: bbox.y + bbox.height/2
+  };
+}
+
+getRouteStyle(pointType) {
+  return {
+    stroke: this.getColorByType(pointType),
+    strokeWidth: '3px',
+    fill: 'none',
+    vectorEffect: 'non-scaling-stroke',
+    ...(this.state.isTempRoute && { // Для временных маршрутов
+      strokeDasharray: '5,3',
+      opacity: '0.7'
+    })
+  };
+}
    processRoutePoint(point) {
     if (!this.state.currentRoute) {
       this.state.currentRoute = {
@@ -534,7 +656,10 @@ finishRoute() {
 
   const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
   const points = this.state.currentRoute.points;
-  
+    // Берем цвет ИСХОДНОЙ точки (первой в маршруте)
+  const lineColor = this.getColorByType(points[0].type); 
+ 
+  path.setAttribute('stroke', lineColor);
   // Преобразование координат в строку пути
   let d = `M ${points[0].x} ${points[0].y}`;
   for (let i = 1; i < points.length; i++) {
